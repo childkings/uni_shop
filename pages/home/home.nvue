@@ -1,6 +1,30 @@
 <template>
   <view>
-    home
+    <swiper class="home_swiper" indicator-dots 	indicator-active-color="#c00000" 	autoplay 	circular>
+      <swiper-item v-for="(item,index) in swiperList" :key="item.goods_id">
+        <navigator :url="'/subpkg/goods_detail/goods_detail?goods_id='+item.goods_id"><image :src="item.image_src"></image></navigator>
+      </swiper-item>
+    </swiper>
+    <view class="nav_list">
+      <view class="nav_img"  v-for="(item,index) in navList" :key="index">
+        <image :src="item.image_src" @click="navClickHandler(item.name)"></image>
+      </view>
+    </view>
+    <view class="floor_list">
+      <view class="floor_item" v-for="(item,index) in floorList" :key="index">
+        <image :src="item.floor_title.image_src" class="floor_title"></image>
+        <view class="floor_img_box">
+          <navigator :url="item.product_list[0].url" class="left_img_box">
+            <image :src="item.product_list[0].image_src" :style="{width:item.product_list[0].image_width+ 'rpx'}" mode="widthFix"></image>
+          </navigator>
+          <view class="right_img_box">
+            <navigator :url="item2.url" class="right_img_item" v-for="(item2,index2) in item.product_list" :ket="index2" v-if="index2 !== 0">
+              <image :src="item2.image_src" :style="{width: item2.image_width + 'rpx'}" mode="widthFix"></image>
+            </navigator>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -8,12 +32,101 @@
   export default {
     data() {
       return {
-        
+        swiperList: [],
+        navList: [],
+        floorList: []
       };
+    },
+    onLoad() {
+      this.getSwiperList()
+      this.getNavList()
+      this.getFloorList()
+    },
+    methods: {
+      async getSwiperList() {
+        const { data:res} = await uni.$http.get('/home/swiperdata')
+        if(res.meta.status !== 200) {
+          return
+        }
+        this.swiperList = res.message
+      },
+      async getNavList() {
+        const { data:res} = await uni.$http.get('/home/catitems')
+        if(res.meta.status !== 200) {
+          return
+        }
+        this.navList = res.message
+      },
+      async getFloorList() {
+        const { data:res} = await uni.$http.get('/home/floordata')
+        if(res.meta.status !== 200) {
+          return
+        }
+        res.message.forEach(floor => {
+          floor.product_list.forEach(prod=> {
+            prod.url = '/subpkg/goods_list/goods_list?' + prod.navigator_url.split('?')[1]
+          })
+        })
+        this.floorList = res.message
+      },
+      navClickHandler(name) {
+        if(name === '分类') {
+          uni.switchTab({
+            url: '/pages/cate/cate'
+          })
+        }
+      }
     }
+    
   }
 </script>
 
 <style lang="scss">
-
+.home_swiper {
+  height: 330rpx;
+  navigator {
+    width: 100%;
+    height: 100%;
+    image {
+      width: 100%;
+      height: 100%
+    }
+  }
+}
+.nav_list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin: 15px 0;
+  image {
+    width: 128rpx;
+    height: 140rpx;
+  }
+}
+.floor_item {
+  margin: 10rpx;
+}
+.floor_title {
+  display: flex;
+  width: 100%;
+  height: 60rpx;
+}
+.floor_img_box {
+  display: flex;
+  flex-direction: row;
+  padding-left: 10rpx;
+}
+.right_img_box {
+  flex: 1;
+  height: 50%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-content: space-between;
+  flex-wrap: wrap;
+  margin-left: 15rpx;
+  .right_img_item {
+    padding: 2rpx;
+  }
+}
 </style>
