@@ -1,5 +1,6 @@
 <template>
   <view>
+    <my-search @click="gotoSearch"></my-search>
     <view class="scroll_view_container">
       <scroll-view scroll-y="true" class="left_scroll_view"  :style="{height:wh+'px'}">
         <block v-for="(item,index) in cateList" :key="index">
@@ -50,10 +51,17 @@
         uni.navigateTo({
           url: '/subpkg/goods_list/goods_list?cid=' + item3.cat_id
         })
+      },
+      gotoSearch() {
+        uni.navigateTo({
+          url: '/subpkg/search/search'
+        })
       }
     },
     onLoad() {
-      this.wh = uni.getSystemInfoSync().windowHeight
+      const sysInfo = uni.getSystemInfoSync()
+      // 可用高度 = 屏幕高度 - navigationBar高度 - tabBar高度 - 自定义的search组件高度
+      this.wh = sysInfo.windowHeight - 50
       this.getCateList()
     }
   }
