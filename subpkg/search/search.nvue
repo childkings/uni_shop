@@ -14,11 +14,11 @@
       <!-- 标题区域 -->
       <view class="history-title">
         <text>搜索历史</text>
-        <uni-icons type="trash" size="17"></uni-icons>
+        <uni-icons type="trash" size="17" @click="cleanHistory"></uni-icons>
       </view>
       <!-- 列表区域 -->
       <view class="history-list">
-        <text :text="item" v-for="(item, i) in historys" :key="i">
+        <text :text="item" v-for="(item, i) in historys" :key="i" @click="gotoGoodsList(item)">
           {{item}}
         </text>
       </view>
@@ -44,7 +44,6 @@
           this.getSearchResults()
         },500)
       },
-        
       async getSearchResults() {
         if(this.kw.trim().length === 0 ) {
           this.searchResults = []
@@ -65,6 +64,14 @@
       },
       saveSearchHistory() {
           this.historyList.push(this.kw)
+      },
+      cleanHistory() {
+        this.historyList = []
+      },
+      gotoGoodsList(kw) {
+        uni.navigateTo({
+          url: '/subpkg/goods_list/goods_list?query=' + kw
+        })
       }
     },
     computed: {
