@@ -3,6 +3,8 @@
 import Vue from 'vue'
 import App from './App'
 import {$http} from '@escook/request-miniprogram'
+import store from './store/store.js'
+
 
 uni.$http = $http
 $http.baseUrl = 'https://api-ugo-web.itheima.net/api/public/v1'
@@ -26,7 +28,8 @@ Vue.config.productionTip = true
 App.mpType = 'app'
 
 const app = new Vue({
-    ...App
+    ...App,
+    store
 })
 app.$mount()
 // #endif
